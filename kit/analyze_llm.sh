@@ -4,7 +4,7 @@ cd "$(dirname "$0")"
 RUNS=runs_llm ./venv/bin/python - <<'PY'
 import afl_an as a
 for srv in ("old","agent","adro"):
-    for st in ("llmblind","llmtree"):
+    for st in ("llmblind","llmtree","llmtreeq"):
         D=a.collect(srv,st)
         if not D: continue
         print(f"== {srv} {st} (시드 {len(D)})")
