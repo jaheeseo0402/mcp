@@ -1,0 +1,17 @@
+{
+  "name": "srv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@adpharm/mcp-server-filesystem-ro": "^0.1.2",
+    "@agent-infra/mcp-server-filesystem": "^1.2.29",
+    "@redf0x1/mcp-server-filesystem": "^1.1.0"
+  }
+}
