@@ -145,6 +145,9 @@ class LLM:  # LLM이 미리 만들어 둔 경로 입력 풀(1회 생성, 고정)
         if A.pool.startswith("auto:"):  # 자동 생성: 폴더를 읽어 LLM을 호출 (llm_gen.py)
             import llm_gen
             P = llm_gen.generate(ROOT, PARENT, A.pool[5:], tools, os.path.join(RUN, "llm_pool.json"))
+        elif A.pool.startswith("raw:"):  # LLM 채팅창 응답을 그대로 저장한 파일
+            import llm_gen
+            P = llm_gen.load_raw(A.pool[4:], ROOT, PARENT)
         else:
             P = json.load(open(A.pool))["paths"]
         self.pool = [p.replace("{ROOT}", ROOT).replace("{PARENT}", PARENT).replace("{ROOTNAME}", os.path.basename(ROOT)) for p in P]

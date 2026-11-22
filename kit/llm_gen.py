@@ -30,7 +30,15 @@ def parse(text):
     arr = json.loads(m.group(0))
     return [x for x in arr if isinstance(x, str)]
 
+def call_gemini(prompt):
+    key = os.environ["GEMINI_API_KEY"]; model = os.environ.get("LLM_MODEL", "gemini-2.5-flash")
+    body = json.dumps({"contents": [{"parts": [{"text": prompt}]}]}).encode()
+    req = urllib.request.Request(f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}", body, {"content-type": "application/json"})
+    r = json.load(urllib.request.urlopen(req, timeout=120))
+    return "".join(p.get("text", "") for p in r["candidates"][0]["content"]["parts"])
+
 def call_llm(prompt):
+    if os.environ.get("GEMINI_API_KEY") and not os.environ.get("ANTHROPIC_API_KEY"): return call_gemini(prompt)
     if os.environ.get("LLM_STUB"):
         return json.dumps(["sample.txt", "../x", ""])
     key = os.environ["ANTHROPIC_API_KEY"]
@@ -46,6 +54,29 @@ def generate(root, parent, level, tools, save_to):
     prompt = build_prompt(root, parent, level, tools)
     raw = call_llm(prompt)
     pool = parse(raw)
-    json.dump({"level": level, "model": os.environ.get("LLM_MODEL", "claude-sonnet-5-5"), "prompt": prompt, "raw": raw, "paths": pool},
+    json.dump({"level": level, "model": os.environ.get("LLM_MODEL", "(provider default)"), "prompt": prompt, "raw": raw, "paths": pool},
               open(save_to, "w"), ensure_ascii=False, indent=1)
     return pool
+
+
+# ---- 수동 붙여넣기 방식(API 없이): 프롬프트를 출력 -> 아무 LLM 채팅창에 붙여넣기 -> 응답을 고치지 말고 파일로 저장 ----
+SIBLINGS = ["other_a", "other_b", "sandbox_secret"]   # 실험 폴더 구성(afl_fuzz.py가 만드는 것과 같음)
+def manual_prompt(level, tools):
+    """실행 경로가 아닌 고정 가짜 경로(/data/sandbox)로 프롬프트를 만든다. 응답의 /data/sandbox, /data는 실행 때 실제 경로로 바뀐다."""
+    import tempfile, shutil
+    d = tempfile.mkdtemp(); root = os.path.join(d, "data", "sandbox")
+    shutil.copytree(os.path.join(os.path.dirname(os.path.abspath(__file__)), "base_orig"), root)
+    for n in SIBLINGS: os.makedirs(os.path.join(d, "data", n), exist_ok=True)
+    p = build_prompt(root, os.path.join(d, "data"), level, tools).replace(root, "/data/sandbox")
+    shutil.rmtree(d); return p
+
+def load_raw(path, root, parent):
+    return [p.replace("/data/sandbox", root).replace("/data", parent) for p in parse(open(path, encoding="utf-8").read())]
+
+if __name__ == "__main__":
+    import sys
+    # 사용: python3 llm_gen.py prompt blind|tree   -> 프롬프트 출력
+    TOOLS = [{"name": n, "inputSchema": {"properties": {k: {} for k in ks}}, "description": ""} for n, ks in
+             [("read_file", ["path"]), ("write_file", ["path", "content"]), ("edit_file", ["path"]), ("list_directory", ["path"]), ("get_file_info", ["path"]),
+              ("create_directory", ["path"]), ("move_file", ["source", "destination"]), ("search_files", ["path", "pattern"]), ("directory_tree", ["path"])]]
+    print(manual_prompt(sys.argv[2], TOOLS))
