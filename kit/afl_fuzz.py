@@ -142,7 +142,11 @@ class Ours:  # 경로형 필드는 서버 폴더를 읽어 만든 4종류(각 25
 class LLM:  # LLM이 미리 만들어 둔 경로 입력 풀(1회 생성, 고정)에서 경로형 필드를 뽑는다. 나머지 필드는 havoc.
     name = "llm"
     def __init__(self):
-        P = json.load(open(A.pool))["paths"]
+        if A.pool.startswith("auto:"):  # 자동 생성: 폴더를 읽어 LLM을 호출 (llm_gen.py)
+            import llm_gen
+            P = llm_gen.generate(ROOT, PARENT, A.pool[5:], tools, os.path.join(RUN, "llm_pool.json"))
+        else:
+            P = json.load(open(A.pool))["paths"]
         self.pool = [p.replace("{ROOT}", ROOT).replace("{PARENT}", PARENT).replace("{ROOTNAME}", os.path.basename(ROOT)) for p in P]
     def begin_call(self, tool): pass
     def field(self, k, spec, cur, other):
