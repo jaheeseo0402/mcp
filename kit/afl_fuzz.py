@@ -6,7 +6,8 @@ KIT = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, KIT)
 from mcpc import Client
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--strategy", required=True, choices=["random", "mcpfuzzer", "ours"])
+ap.add_argument("--strategy", required=True, choices=["random", "mcpfuzzer", "ours", "llm"])
+ap.add_argument("--pool", default="", help="llm 전략: 미리 만든 입력 풀(JSON)")
 ap.add_argument("--server", required=True, choices=["old", "agent", "adro"])
 ap.add_argument("--seed", type=int, default=1)
 ap.add_argument("--per-tool", type=int, default=1000)
@@ -138,7 +139,17 @@ class Ours:  # 경로형 필드는 서버 폴더를 읽어 만든 4종류(각 25
             return rng.choice([self.escape, self.boundary, self.valid, self.near])()
         return havoc(cur, other if isinstance(other, str) else None)
 
-strat = {"random": Random, "mcpfuzzer": McpFuzzer, "ours": Ours}[A.strategy]()
+class LLM:  # LLM이 미리 만들어 둔 경로 입력 풀(1회 생성, 고정)에서 경로형 필드를 뽑는다. 나머지 필드는 havoc.
+    name = "llm"
+    def __init__(self):
+        P = json.load(open(A.pool))["paths"]
+        self.pool = [p.replace("{ROOT}", ROOT).replace("{PARENT}", PARENT).replace("{ROOTNAME}", os.path.basename(ROOT)) for p in P]
+    def begin_call(self, tool): pass
+    def field(self, k, spec, cur, other):
+        if isinstance(spec, dict) and ptype(spec) == "string" and is_pathlike(k, spec): return rng.choice(self.pool)
+        return havoc(cur, other if isinstance(other, str) else None)
+
+strat = {"random": Random, "mcpfuzzer": McpFuzzer, "ours": Ours, "llm": LLM}[A.strategy]()
 
 # ---------------- 메인 루프 ----------------
 log = open(os.path.join(RUN, "calls.jsonl"), "w")

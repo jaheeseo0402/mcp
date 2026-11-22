@@ -27,6 +27,12 @@ ls runs_abl/*/summary.json | wc -l   # 완료 개수 확인 (집계 스크립트
 for s in 1 2 3 4 5; do bash run_real_tool.sh old $s; bash run_real_tool.sh agent $s; done   # 한 번에 하나씩 순서대로
 ./venv/bin/python an_real.py old agent
 ```
+## 3-2. LLM 입력 풀 조건 (llm/PROMPTS.md, docs/LLM_PLAN.md 참고)
+```
+bash run_llm.sh "old agent adro" "1 2 3 4 5 6 7 8 9 10"          # 결과: runs_llm/
+RUNS=runs_llm bash analyze_llm.sh
+```
+
 ## 4. 예전(AFL 틀 이전) 실험 = 슬라이드 17~20, 23~29의 원본
 ```
 bash legacy/iso_all.sh        # 제안/랜덤/구성요소 제거/경로 종류 제거 (시드 6개)
