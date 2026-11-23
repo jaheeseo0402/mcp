@@ -4,6 +4,8 @@
 import os, sys, json, time, random, argparse, asyncio, select, urllib.parse, subprocess
 KIT = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, KIT)
 from mcpc import Client
+from common import PATH_HINTS
+import hashlib, secrets
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--strategy", required=True, choices=["random", "mcpfuzzer", "ours", "llm"])
@@ -23,7 +25,24 @@ ROOT = os.path.join(RUN, "iso", "sandbox"); PARENT = os.path.dirname(ROOT)
 if os.path.exists(PARENT): subprocess.run(["rm", "-rf", PARENT])
 os.makedirs(PARENT); subprocess.run(["cp", "-a", os.path.join(KIT, "base_orig"), ROOT])
 for d in ("sandbox_secret", "other_a", "other_b"): os.makedirs(os.path.join(PARENT, d))
-open(os.path.join(PARENT, "sandbox_secret", "secret.txt"), "w").write("TOP_SECRET_OUTSIDE\n")
+# --- 보안 오라클용 준비: 허용 폴더 밖 파일에 실행마다 다른 난수 토큰을 심는다 ---
+TOKENS = {"sandbox_secret/secret.txt": "TOP_SECRET_OUTSIDE\nTOK_" + secrets.token_hex(8) + "\n",
+          "other_a/data.txt": "TOK_" + secrets.token_hex(8) + "\n"}
+for rel, tk in TOKENS.items(): open(os.path.join(PARENT, rel), "w").write(tk)
+TOKVALS = [l for tk in TOKENS.values() for l in tk.split() if l.startswith("TOK_")]
+OUT_NAMES = ("secret.txt", "data.txt")  # 허용 폴더 밖에만 있는 파일 이름 (목록 노출 판정용)
+def fp_outside():
+    """허용 폴더(ROOT) 밖 파일시스템의 지문. 호출 전후를 비교해 실제 생성·변경·삭제를 잡는다."""
+    out = {}
+    for dp, dn, fn in os.walk(PARENT):
+        if os.path.abspath(dp) == os.path.abspath(ROOT): dn[:] = []; continue
+        dn[:] = [d for d in dn if os.path.abspath(os.path.join(dp, d)) != os.path.abspath(ROOT)]
+        rel = os.path.relpath(dp, PARENT); out[rel + "/"] = "d"
+        for f in fn:
+            fpth = os.path.join(dp, f)
+            try: out[os.path.join(rel, f)] = hashlib.sha1(open(fpth, "rb").read()).hexdigest()
+            except OSError: out[os.path.join(rel, f)] = "?"
+    return out
 
 SRV = {"old": (["node", KIT + "/node_modules/mcp-server-filesystem/dist/index.js", ROOT]),
        "agent": (["node", KIT + "/srv/node_modules/@agent-infra/mcp-server-filesystem/dist/index.cjs", "--allowed-directories", ROOT]),
@@ -36,7 +55,6 @@ cli = start(); cli.cov_new()
 tools = cli.req("tools/list")["result"]["tools"]; cli.cov_new()
 
 # ---------------- 공통 부품 ----------------
-PATH_HINTS = ("path", "file", "dir", "folder", "source", "destination", "target")
 def ptype(spec):
     t = spec.get("type")
     if isinstance(t, list): t = next((x for x in t if x != "null"), "string")
@@ -160,7 +178,7 @@ strat = {"random": Random, "mcpfuzzer": McpFuzzer, "ours": Ours, "llm": LLM}[A.s
 
 # ---------------- 메인 루프 ----------------
 log = open(os.path.join(RUN, "calls.jsonl"), "w")
-queue = {}; nc = 0; t0 = time.time()
+queue = {}; nc = 0; t0 = time.time(); FP = fp_outside()
 for tool in tools:
     nm = tool["name"]; sch = tool.get("inputSchema") or {}; props = sch.get("properties", {}); req = set(sch.get("required", []))
     queue[nm] = [{k: seed_val(v, k) for k, v in props.items() if k in req}]
@@ -181,7 +199,17 @@ for tool in tools:
         if "error" in r and r["error"].get("message") == "server closed": cli.close(); cli = start(); cli.cov_new(); cli.req("tools/list"); cli.cov_new()
         res = r.get("result") or {}
         txt = json.dumps(r["error"]) if r.get("error") else " ".join(x.get("text", "") for x in (res.get("content") or []) if isinstance(x, dict))
-        log.write(json.dumps({"tool": nm, "args": args, "txt": txt[:300], "err": bool(r.get("error")) or bool(res.get("isError")), "new": new}) + "\n")
+        iserr = bool(r.get("error")) or bool(res.get("isError"))
+        # --- 보안 오라클: 응답 문구가 아니라 실제 파일시스템 상태로 판정 ---
+        viol = []; eff = []
+        fp2 = fp_outside()
+        if fp2 != FP:
+            viol.append("mutate"); eff = sorted(k for k in set(fp2) | set(FP) if fp2.get(k) != FP.get(k))[:4]; FP = fp2
+        if not iserr:
+            if any(t in txt for t in TOKVALS): viol.append("leak")
+            argtxt = json.dumps(args)
+            if any(n in txt and n not in argtxt for n in OUT_NAMES): viol.append("list")
+        log.write(json.dumps({"tool": nm, "args": args, "txt": txt[:300], "err": iserr, "new": new, "viol": viol, "eff": eff}) + "\n")
         if new > 0 and len(queue[nm]) < 400: queue[nm].append(json.loads(json.dumps(args)))
         nc += 1
 log.close(); cli.close()
