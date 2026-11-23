@@ -18,21 +18,30 @@ ap.add_argument("--per-tool", type=int, default=1000)
 ap.add_argument("--out", required=True)
 ap.add_argument("--no-cov", action="store_true")
 ap.add_argument("--variant", default="full", choices=["full","allstr","nameonly","noconst"])
+ap.add_argument("--rename", action="store_true", help="3단계: 허용 폴더·이웃 폴더·비밀 파일 이름을 시드마다 무작위로 바꾼다 (허용 폴더 이름과 접두어가 같은 이웃은 유지)")
 ap.add_argument("--seedmode", default="generic", choices=["generic", "real"])
 A = ap.parse_args()
 
 rng = random.Random(A.seed)
 RUN = os.path.abspath(A.out); os.makedirs(RUN, exist_ok=True)
-ROOT = os.path.join(RUN, "iso", "sandbox"); PARENT = os.path.dirname(ROOT)
+ROOTNAME, SIB, SECRETF, DATAF, OTHERS = "sandbox", "sandbox_secret", "secret.txt", "data.txt", ("other_a", "other_b")
+if A.rename:  # 이름 무작위화: 실험마다 다른 이름 (실험 전에 정한 목록에서 시드로 고정 추출)
+    r2 = random.Random(A.seed * 7919 + 13)
+    ROOTNAME = r2.choice(["workspace", "project", "docs", "files", "repo", "work", "shared", "projects"])
+    SIB = ROOTNAME + r2.choice(["_backup", "_old", "_private", "_data", "_copy", "_prod", "_internal", "2", "-secret", "_keys"])
+    SECRETF = r2.choice(["passwords.txt", "notes.txt", "keys.txt", "token.txt", "config.json", "credentials.txt", "report.txt", "backup.db"])
+    DATAF = r2.choice(["data.csv", "info.txt", "list.txt", "log.txt"])
+    OTHERS = tuple(r2.sample(["archive", "tmp_files", "media", "cache", "export", "public"], 2))
+ROOT = os.path.join(RUN, "iso", ROOTNAME); PARENT = os.path.dirname(ROOT)
 if os.path.exists(PARENT): subprocess.run(["rm", "-rf", PARENT])
 os.makedirs(PARENT); subprocess.run(["cp", "-a", os.path.join(KIT, "base_orig"), ROOT])
-for d in ("sandbox_secret", "other_a", "other_b"): os.makedirs(os.path.join(PARENT, d))
+for d in (SIB,) + OTHERS: os.makedirs(os.path.join(PARENT, d))
 # --- 보안 오라클용 준비: 허용 폴더 밖 파일에 실행마다 다른 난수 토큰을 심는다 ---
-TOKENS = {"sandbox_secret/secret.txt": "TOP_SECRET_OUTSIDE\nTOK_" + secrets.token_hex(8) + "\n",
-          "other_a/data.txt": "TOK_" + secrets.token_hex(8) + "\n"}
+TOKENS = {SIB + "/" + SECRETF: "TOP_SECRET_OUTSIDE\nTOK_" + secrets.token_hex(8) + "\n",
+          OTHERS[0] + "/" + DATAF: "TOK_" + secrets.token_hex(8) + "\n"}
 for rel, tk in TOKENS.items(): open(os.path.join(PARENT, rel), "w").write(tk)
 TOKVALS = [l for tk in TOKENS.values() for l in tk.split() if l.startswith("TOK_")]
-OUT_NAMES = ("secret.txt", "data.txt")  # 허용 폴더 밖에만 있는 파일 이름 (목록 노출 판정용)
+OUT_NAMES = (SECRETF, DATAF)  # 허용 폴더 밖에만 있는 파일 이름 (목록 노출 판정용)
 def fp_outside():
     """허용 폴더(ROOT) 밖 파일시스템의 지문. 호출 전후를 비교해 실제 생성·변경·삭제를 잡는다."""
     out = {}
@@ -268,5 +277,5 @@ log.close(); cli.close()
 total = 0
 if COV and os.path.exists(COV):
     ls = open(COV).read().splitlines(); total = json.loads(ls[-1])["total"] if ls else 0
-json.dump({"calls": nc, "cov_total": total, "secs": round(time.time() - t0, 1), "queue": {k: len(v) for k, v in queue.items()}}, open(os.path.join(RUN, "summary.json"), "w"))
+json.dump({"rootname": ROOTNAME, "sib": SIB, "secret": SECRETF, "calls": nc, "cov_total": total, "secs": round(time.time() - t0, 1), "queue": {k: len(v) for k, v in queue.items()}}, open(os.path.join(RUN, "summary.json"), "w"))
 print("done", A.strategy, A.server, A.seed, nc, total, round(time.time() - t0))

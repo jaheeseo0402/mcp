@@ -15,7 +15,8 @@ def cls(t, err):
     if err: return "err"
     return "ok"
 def one(d):
-    ROOT = os.path.join(os.path.abspath(d), "iso", "sandbox"); n = out = 0; c = {"folder": 0, "format": 0, "nofile": 0, "err": 0, "ok": 0}
+    s = json.load(open(os.path.join(d, "summary.json")))
+    ROOT = os.path.join(os.path.abspath(d), "iso", s.get("rootname", "sandbox")); n = out = 0; c = {"folder": 0, "format": 0, "nofile": 0, "err": 0, "ok": 0}
     pairs = set(); vcalls = 0; kinds = {"leak": 0, "mutate": 0, "list": 0}; vpairs = set(); first = None; has = False
     for line in open(os.path.join(d, "calls.jsonl")):
         r = json.loads(line); n += 1; k = cls(r["txt"], r["err"]); c[k] += 1
@@ -29,7 +30,6 @@ def one(d):
             if is_path_name(kk) and isinstance(v, str) and v:
                 ab = os.path.normpath(v if v.startswith("/") else os.path.join(ROOT, v))
                 if not (ab == ROOT or ab.startswith(ROOT + "/")): out += 1; pairs.add((r["tool"], ab)); break
-    s = json.load(open(os.path.join(d, "summary.json")))
     m = dict(out=out, pairs=len(pairs), reach=100 * (n - c["folder"] - c["format"]) / n, ok=100 * c["ok"] / n, cov=s["cov_total"], n=n)
     if has: m.update(viol=vcalls, vuniq=len(vpairs), leak=kinds["leak"], mutate=kinds["mutate"], list=kinds["list"], first=first if first else n + 1)
     return m
