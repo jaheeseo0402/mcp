@@ -11,6 +11,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--strategy", required=True, choices=["random", "mcpfuzzer", "ours", "llm", "info"])
 ap.add_argument("--info-level", type=int, default=3, choices=[0, 1, 2, 3, 4], help="info 전략: 알고 있는 서버 정보 수준 (0 없음 / 1 허용 폴더 경로만 / 2 +폴더 내부 구조 / 3 +이웃 폴더 이름 / 4 +이웃 폴더 안 파일 이름)")
 ap.add_argument("--info-gen", default="four", choices=["four", "rand"], help="four = 4종류(경로 이탈·경계값·유효·준유효 각 25퍼센트) / rand = 같은 정보로 이름을 무작위 조합만 함(대조)")
+ap.add_argument("--esc-share", type=float, default=-1, help="통제 실험: 경로 이탈 입력의 비율(0~1)을 four와 rand 모두 같게 맞춘다. 기본(-1)은 기존 동작")
 ap.add_argument("--pool", default="", help="llm 전략: 미리 만든 입력 풀(JSON)")
 ap.add_argument("--server", required=True, choices=["old", "agent", "adro"])
 ap.add_argument("--seed", type=int, default=1)
@@ -211,11 +212,23 @@ class Info:  # 정보 수준(0~4)과 생성 방식(four/rand)을 따로 바꾸�
         c = ["", ".", "/", " ", "a" * 255, "a" * 4096, self.j("no_such_dir/deep/x.txt"), self.valid() + "/"]
         if self.root: c += [ROOT, ROOT + "/"]
         return rng.choice(c)
-    def rand(self): return rng.choice(self.prefixes) + rng.choice(self.known)
+    def rand(self):
+        if A.esc_share >= 0:  # 비율 통제: 이탈이면 이웃 폴더 이름+위로 올라가는 접두어, 아니면 폴더 안 이름+안쪽 접두어
+            if rng.random() < A.esc_share:
+                up = ["../", "../../"] + ([self.par + "/"] if self.par else [])
+                return rng.choice(up) + rng.choice(self.outside)
+            inn = [""] + ([self.root + "/"] if self.root else [])
+            return rng.choice(inn) + rng.choice(self.inside)
+        return rng.choice(self.prefixes) + rng.choice(self.known)
+    def four_ctl(self):
+        if rng.random() < A.esc_share: return self.escape()
+        return rng.choice([self.boundary, self.valid, self.near])()
     def begin_call(self, tool): pass
     def field(self, k, spec, cur, other):
         if isinstance(spec, dict) and ptype(spec) == "string" and is_pathlike(k, spec):
-            return self.rand() if self.gen == "rand" else rng.choice([self.escape, self.boundary, self.valid, self.near])()
+            if self.gen == "rand": return self.rand()
+            if A.esc_share >= 0: return self.four_ctl()
+            return rng.choice([self.escape, self.boundary, self.valid, self.near])()
         return havoc(cur, other if isinstance(other, str) else None)
 
 class LLM:  # LLM이 미리 만들어 둔 경로 입력 풀(1회 생성, 고정)에서 경로형 필드를 뽑는다. 나머지 필드는 havoc.
