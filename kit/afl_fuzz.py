@@ -8,7 +8,9 @@ from common import PATH_HINTS
 import hashlib, secrets
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--strategy", required=True, choices=["random", "mcpfuzzer", "ours", "llm"])
+ap.add_argument("--strategy", required=True, choices=["random", "mcpfuzzer", "ours", "llm", "info"])
+ap.add_argument("--info-level", type=int, default=3, choices=[0, 1, 2, 3, 4], help="info 전략: 알고 있는 서버 정보 수준 (0 없음 / 1 허용 폴더 경로만 / 2 +폴더 내부 구조 / 3 +이웃 폴더 이름 / 4 +이웃 폴더 안 파일 이름)")
+ap.add_argument("--info-gen", default="four", choices=["four", "rand"], help="four = 4종류(경로 이탈·경계값·유효·준유효 각 25%) / rand = 같은 정보로 이름을 무작위 조합만 함(대조)")
 ap.add_argument("--pool", default="", help="llm 전략: 미리 만든 입력 풀(JSON)")
 ap.add_argument("--server", required=True, choices=["old", "agent", "adro"])
 ap.add_argument("--seed", type=int, default=1)
@@ -157,6 +159,56 @@ class Ours:  # 경로형 필드는 서버 폴더를 읽어 만든 4종류(각 25
             return rng.choice([self.escape, self.boundary, self.valid, self.near])()
         return havoc(cur, other if isinstance(other, str) else None)
 
+class Info:  # 정보 수준(0~4)과 생성 방식(four/rand)을 따로 바꾸는 통제 실험용. 나머지 필드는 havoc.
+    name = "info"
+    GUESS_OUT = ["etc", "tmp", "backup", "data", "private", "home"]  # 서버 구조를 모를 때 쓰는 일반적인 추측 이름(고정, 실험 전에 정함)
+    def __init__(self):
+        L = A.info_level; self.L = L; self.gen = A.info_gen
+        self.root = ROOT if L >= 1 else None; self.par = PARENT if L >= 1 else None
+        self.inside = ["sample.txt"]
+        if L >= 2:
+            self.inside = []
+            for d, ds, fs in os.walk(ROOT):
+                ds[:] = [x for x in ds if x != ".git"]
+                for n in fs + ds: self.inside.append(os.path.relpath(os.path.join(d, n), ROOT))
+                if len(self.inside) > 200: break
+            self.inside = self.inside or ["notes.txt"]
+        self.outside = list(self.GUESS_OUT)
+        if L >= 3:
+            self.outside = [n for n in os.listdir(PARENT) if os.path.join(PARENT, n) != ROOT] or ["x"]
+        if L >= 4:
+            more = []
+            for n in list(self.outside):
+                full = os.path.join(PARENT, n)
+                if os.path.isdir(full):
+                    for d, ds, fs in os.walk(full):
+                        for f in fs: more.append(os.path.relpath(os.path.join(d, f), PARENT))
+            self.outside = self.outside + more
+        self.known = self.inside + self.outside
+        self.prefixes = [""] + ["../", "../../"] + ([self.root + "/", self.par + "/"] if self.root else [])
+    def j(self, rel): return os.path.join(self.root, rel) if self.root else rel
+    def valid(self): return self.j(rng.choice(self.inside))
+    def near(self):
+        base = rng.choice(self.inside); d, n = os.path.split(base); stem, ext = os.path.splitext(n)
+        v = [base, os.path.join(d, stem + ".bak"), base + "~", os.path.join(d, n.upper()), "./" + base,
+             os.path.join(d, stem[:-1] + ext), os.path.join(d, stem + "_v2" + ext), os.path.join("subdir", n)]
+        return self.j(rng.choice(v))
+    def escape(self):
+        k = rng.randint(1, 6); name = rng.choice(self.outside); c = ["../" * k + name, "..\\" * k + name,
+            urllib.parse.quote("../" * k, safe="") + name, "....//" * k + name, self.valid() + "\x00.txt"]
+        if self.root: c += [os.path.join(ROOT, "../" * k + name), os.path.join(PARENT, name), ROOT + "_sibling/" + name]
+        return rng.choice(c)
+    def boundary(self):
+        c = ["", ".", "/", " ", "a" * 255, "a" * 4096, self.j("no_such_dir/deep/x.txt"), self.valid() + "/"]
+        if self.root: c += [ROOT, ROOT + "/"]
+        return rng.choice(c)
+    def rand(self): return rng.choice(self.prefixes) + rng.choice(self.known)
+    def begin_call(self, tool): pass
+    def field(self, k, spec, cur, other):
+        if isinstance(spec, dict) and ptype(spec) == "string" and is_pathlike(k, spec):
+            return self.rand() if self.gen == "rand" else rng.choice([self.escape, self.boundary, self.valid, self.near])()
+        return havoc(cur, other if isinstance(other, str) else None)
+
 class LLM:  # LLM이 미리 만들어 둔 경로 입력 풀(1회 생성, 고정)에서 경로형 필드를 뽑는다. 나머지 필드는 havoc.
     name = "llm"
     def __init__(self):
@@ -174,7 +226,7 @@ class LLM:  # LLM이 미리 만들어 둔 경로 입력 풀(1회 생성, 고정)
         if isinstance(spec, dict) and ptype(spec) == "string" and is_pathlike(k, spec): return rng.choice(self.pool)
         return havoc(cur, other if isinstance(other, str) else None)
 
-strat = {"random": Random, "mcpfuzzer": McpFuzzer, "ours": Ours, "llm": LLM}[A.strategy]()
+strat = {"random": Random, "mcpfuzzer": McpFuzzer, "ours": Ours, "llm": LLM, "info": Info}[A.strategy]()
 
 # ---------------- 메인 루프 ----------------
 log = open(os.path.join(RUN, "calls.jsonl"), "w")
