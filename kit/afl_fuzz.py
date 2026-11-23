@@ -10,7 +10,7 @@ import hashlib, secrets
 ap = argparse.ArgumentParser()
 ap.add_argument("--strategy", required=True, choices=["random", "mcpfuzzer", "ours", "llm", "info"])
 ap.add_argument("--info-level", type=int, default=3, choices=[0, 1, 2, 3, 4], help="info 전략: 알고 있는 서버 정보 수준 (0 없음 / 1 허용 폴더 경로만 / 2 +폴더 내부 구조 / 3 +이웃 폴더 이름 / 4 +이웃 폴더 안 파일 이름)")
-ap.add_argument("--info-gen", default="four", choices=["four", "rand"], help="four = 4종류(경로 이탈·경계값·유효·준유효 각 25%) / rand = 같은 정보로 이름을 무작위 조합만 함(대조)")
+ap.add_argument("--info-gen", default="four", choices=["four", "rand"], help="four = 4종류(경로 이탈·경계값·유효·준유효 각 25퍼센트) / rand = 같은 정보로 이름을 무작위 조합만 함(대조)")
 ap.add_argument("--pool", default="", help="llm 전략: 미리 만든 입력 풀(JSON)")
 ap.add_argument("--server", required=True, choices=["old", "agent", "adro"])
 ap.add_argument("--seed", type=int, default=1)
