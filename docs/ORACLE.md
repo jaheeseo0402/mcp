@@ -45,3 +45,13 @@
 3. old 서버 viol의 시드 간 편차가 크다(±15.7, 중앙 14).
 4. `first`(첫 위반까지 호출 번호)는 도구별 순차 실행 구조라 발견 속도가 아니라 도구 순서를 반영한다. 도구별 첫 위반으로 다시 정의해야 한다. (단측 검정의 p=1.0은 낮을수록 좋은 지표에 방향을 반대로 둔 결과일 뿐 의미 없음.)
 5. 시드 10개 단측 정확 검정의 최소 p가 0.001이므로 "p<0.001"이라고 쓸 수 없다.
+
+### 도구별 위반 (시드 10개 합계, 제안 모델만 발생. Random·mcp-fuzzer는 전 도구 0)
+| 서버 | list_directory (list) | search_files (list) | directory_tree (list) | move_file (mutate) |
+|---|---|---|---|---|
+| old | 128 | 66 | 0 | 10 |
+| agent | 117 | 9 | 113 | 9 |
+
+- 읽기 계열(list_directory, search_files, directory_tree)에서 밖 폴더의 파일 이름이 노출됐다. move_file은 시드마다 정확히 1번(허용 폴더 밖 파일시스템 변경, 10시드 중 old 10, agent 9).
+- read_file·write_file·get_file_info·edit_file 등에서는 오라클 기준 위반이 없었다 (제안 모델이 밖 폴더 안의 파일 이름을 모르므로 파일 내용 읽기·쓰기 입력을 만들지 못함).
+- move_file이 시드당 1번뿐인 이유(첫 이동 후 원본이 사라져 이후 같은 이동이 변경을 일으키지 못함)는 추정이며 calls.jsonl의 `eff` 필드로 확인 필요.
