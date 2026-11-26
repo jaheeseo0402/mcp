@@ -17,7 +17,8 @@ TASK = ("Generate {n} different test input files for the program. Try to make in
         "code paths of its parser, including unusual or malformed ones that may trigger bugs.\n"
         "Output format (strict): exactly one input per line, written as `INPUT: ` followed by the file bytes as a "
         "hexadecimal string without spaces (for example `INPUT: 0a1b2c3d`). Each input must be at most 150 bytes. "
-        "Do not write anything else.")
+        "Every line must be different from all the other lines (change field values, lengths, counts, offsets, tags or order), "
+        "and must not be an exact copy of any example given above. Do not write anything else.")
 
 INFO = {
     "L0": "You are testing a program. You know nothing about what the program does or which file format it reads.",
@@ -59,7 +60,7 @@ def write_prompts():
 
 def ask_ollama(model, prompt, seed):
     body = json.dumps({"model": model, "prompt": prompt, "stream": False,
-                       "options": {"temperature": 0.8, "num_predict": 2000, "seed": seed}}).encode()
+                       "options": {"temperature": 1.0, "top_p": 0.95, "num_predict": 2000, "seed": seed}}).encode()
     req = urllib.request.Request("http://127.0.0.1:11434/api/generate", body, {"Content-Type": "application/json"})
     return json.loads(urllib.request.urlopen(req, timeout=1800).read())["response"]
 
@@ -110,7 +111,10 @@ if __name__ == "__main__":
                 if os.path.exists(fn):
                     continue
                 t0 = time.time(); print(f"{L} #{k} 요청 중...", flush=True)
-                open(fn, "w").write(ask_ollama(model, build_prompt(L), seed=k))
+                resp = ask_ollama(model, build_prompt(L), seed=k)
+                if not resp.strip():
+                    print("  빈 응답: 저장하지 않음"); continue
+                open(fn, "w").write(resp)
                 print(f"  완료 ({time.time() - t0:.0f}초)", flush=True)
         parse(tag)
     elif cmd == "parse":

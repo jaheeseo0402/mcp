@@ -1,4 +1,4 @@
 You are testing a program that reads image files in JPEG format. A JPEG file starts with the bytes FF D8 FF E1.
 
 Generate 10 different test input files for the program. Try to make inputs that reach many different code paths of its parser, including unusual or malformed ones that may trigger bugs.
-Output format (strict): exactly one input per line, written as `INPUT: ` followed by the file bytes as a hexadecimal string without spaces (for example `INPUT: 0a1b2c3d`). Each input must be at most 150 bytes. Do not write anything else.
+Output format (strict): exactly one input per line, written as `INPUT: ` followed by the file bytes as a hexadecimal string without spaces (for example `INPUT: 0a1b2c3d`). Each input must be at most 150 bytes. Every line must be different from all the other lines (change field values, lengths, counts, offsets, tags or order), and must not be an exact copy of any example given above. Do not write anything else.
