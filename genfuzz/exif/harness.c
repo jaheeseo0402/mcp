@@ -19,7 +19,11 @@ static void on_sig(int s){
 #endif
 int main(int argc,char**argv){
 #ifdef TRIAGE
-  signal(SIGSEGV,on_sig); signal(SIGABRT,on_sig); signal(SIGBUS,on_sig); signal(SIGFPE,on_sig);
+  { /* 스택이 바닥난 crash도 잡도록 비상 스택(sigaltstack) 위에서 처리 함수를 실행한다 */
+    static char altstk[65536]; stack_t ss = { .ss_sp = altstk, .ss_size = sizeof altstk, .ss_flags = 0 };
+    sigaltstack(&ss, NULL);
+    struct sigaction sa; memset(&sa, 0, sizeof sa); sa.sa_handler = on_sig; sa.sa_flags = SA_ONSTACK; sigemptyset(&sa.sa_mask);
+    sigaction(SIGSEGV,&sa,NULL); sigaction(SIGABRT,&sa,NULL); sigaction(SIGBUS,&sa,NULL); sigaction(SIGFPE,&sa,NULL); }
 #endif
   if(argc<2) return 1;
   ExifData *d = exif_data_new_from_file(argv[1]);
