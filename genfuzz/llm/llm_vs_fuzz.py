@@ -57,11 +57,11 @@ for k, lab in (("fuzz_only", "fuzzer only"), ("overlap", "both"), ("llm_only", "
     v = [r[k] for r in rows]
     ax[0].bar([r["level"] for r in rows], v, bottom=bot, color=COL[k], label=lab)
     bot = [b + x for b, x in zip(bot, v)]
-ax[0].set_title("(a) Edges: fuzzer vs LLM (same level)", fontsize=10); ax[0].set_ylabel("Edges"); ax[0].legend(); ax[0].set_xlabel("Structure info level")
+ax[0].set_title("(a) Edges: fuzzer vs LLM (same level)", fontsize=10); ax[0].set_ylabel("Edges"); ax[0].set_ylim(0, max(bot) * 1.18); ax[0].legend(loc="upper left", fontsize=8); ax[0].set_xlabel("Structure info level")
 w = 0.26; xs = range(len(rows))
 for j, (k, lab, c) in enumerate((("llm_files", "LLM inputs", "#9aa5b1"), ("llm_self_unique", "after self-dedup", "#2e75b6"), ("llm_remaining", "after fuzzer-dedup", "#1f3a6e"))):
     ax[1].bar([x + (j - 1) * w for x in xs], [r[k] for r in rows], w, color=c, label=lab)
-ax[1].set_xticks(list(xs)); ax[1].set_xticklabels([r["level"] for r in rows]); ax[1].legend(fontsize=8)
+ax[1].set_xticks(list(xs)); ax[1].set_xticklabels([r["level"] for r in rows]); ax[1].set_ylim(0, 14); ax[1].legend(fontsize=8, ncol=3, loc="upper center")
 ax[1].set_title("(b) LLM inputs left after coverage dedup", fontsize=10); ax[1].set_xlabel("Structure info level")
 ax[2].bar([r["level"] for r in rows], [r["remaining_new_edge"] for r in rows], color="#1f3a6e", label="open edges fuzzer lacks")
 ax[2].bar([r["level"] for r in rows], [r["remaining_crash"] for r in rows], color="#d96a1e", width=0.4, label="crashing")

@@ -1,0 +1,5 @@
+level,fuzz_files,llm_files,llm_self_unique,llm_remaining,remaining_new_edge,remaining_crash,bugs,fuzz_only,overlap,llm_only
+L0,282,10,2,0,0,0,,50,106,0
+L1,289,10,8,5,3,1,sig11 exif_log,24,132,66
+L2,1331,10,10,9,1,0,,226,243,3
+L3,1323,10,10,9,0,0,,258,241,0

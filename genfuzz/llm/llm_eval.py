@@ -55,7 +55,7 @@ for L, r in res.items():
     if r["fz"]:
         ax[0].axhline(r["fz"], color=COL[L], lw=0.9, ls=":")
 ax[0].set_title("(a) Cumulative edges of LLM inputs\n(dotted = fuzzer, 10 min, same level)", fontsize=10)
-ax[0].set_xlabel("Number of LLM-generated inputs"); ax[0].set_ylabel("Edges"); ax[0].grid(alpha=0.3); ax[0].legend()
+ax[0].set_xlabel("Number of LLM-generated inputs"); ax[0].set_ylabel("Edges"); ax[0].grid(alpha=0.3); ax[0].legend(fontsize=8, loc="center right")
 Ls = list(res)
 for a, key, tt in ((ax[1], "crash", "(b) Crashing inputs"), (ax[2], "bugs", "(c) Distinct bugs (top frame)")):
     vals = [r[key] if key == "crash" else len(r[key]) for r in res.values()]

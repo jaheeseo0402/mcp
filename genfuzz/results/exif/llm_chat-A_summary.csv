@@ -1,0 +1,5 @@
+level,inputs,edges,crash_inputs,distinct_bugs,bugs,fuzzer_mean_edges
+L0,10,106,0,0,,154.0
+L1,10,198,1,1,sig11 exif_log,154.0
+L2,10,246,0,0,,441.5
+L3,10,241,0,0,,479.2

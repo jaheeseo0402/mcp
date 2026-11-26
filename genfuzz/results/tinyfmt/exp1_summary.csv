@@ -1,0 +1,13 @@
+level,run,total_crashes,unique_crashes,distinct_bugs,bugs,edges
+L0,out_L0_r1,0,0,0,,3
+L0,out_L0_r2,0,0,0,,3
+L0,out_L0_r3,0,0,0,,3
+L1,out_L1_r1,0,0,0,,11
+L1,out_L1_r2,0,0,0,,11
+L1,out_L1_r3,0,0,0,,11
+L2,out_L2_r1,116,2,2,BUG1|BUG2,24
+L2,out_L2_r2,296,2,2,BUG1|BUG2,33
+L2,out_L2_r3,1631,7,2,BUG1|BUG2,39
+L3,out_L3_r1,1103,7,5,BUG1|BUG2|BUG3|BUG4|BUG5,41
+L3,out_L3_r2,1284,7,5,BUG1|BUG2|BUG3|BUG4|BUG5,42
+L3,out_L3_r3,778,7,4,BUG1|BUG2|BUG4|BUG5,42

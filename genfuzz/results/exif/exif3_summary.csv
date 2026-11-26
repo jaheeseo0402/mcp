@@ -1,0 +1,27 @@
+level,run,total_crashes,unique_crashes,distinct_bugs,bugs,edges,distinct_bugs_3frame
+L0,out_L0_r1,0,0,0,,153,0
+L0,out_L0_r2,0,0,0,,153,0
+L0,out_L0_r3,0,0,0,,156,0
+L1,out_L1_r1,0,0,0,,156,0
+L1,out_L1_r2,0,0,0,,153,0
+L1,out_L1_r3,0,0,0,,153,0
+L2,out_L2_r1,95,2,1,sig11 exif_get_sshort,445,1
+L2,out_L2_r10,118,5,2,sig11 +0xad03|sig11 exif_get_sshort,442,2
+L2,out_L2_r2,99,3,1,sig11 exif_get_sshort,426,1
+L2,out_L2_r3,371,13,2,sig11 +0xad03|sig11 exif_get_sshort,450,5
+L2,out_L2_r4,199,2,1,sig11 exif_get_sshort,390,1
+L2,out_L2_r5,106,7,2,sig11 +0xad03|sig11 exif_get_sshort,442,2
+L2,out_L2_r6,233,5,3,sig11 +0xad03|sig11 exif_get_slong|sig11 exif_get_sshort,475,3
+L2,out_L2_r7,114,6,2,sig11 +0xad03|sig11 exif_get_sshort,461,3
+L2,out_L2_r8,80,4,2,sig11 +0xad03|sig11 exif_get_sshort,424,2
+L2,out_L2_r9,139,2,1,sig11 exif_get_sshort,460,1
+L3,out_L3_r1,102,5,1,sig11 exif_get_sshort,471,1
+L3,out_L3_r10,99,5,2,sig11 exif_get_slong|sig11 exif_get_sshort,481,2
+L3,out_L3_r2,77,7,3,sig11 +0xad03|sig11 exif_get_slong|sig11 exif_get_sshort,484,3
+L3,out_L3_r3,104,8,2,sig11 exif_get_slong|sig11 exif_get_sshort,487,2
+L3,out_L3_r4,113,6,1,sig11 exif_get_sshort,471,1
+L3,out_L3_r5,55,5,2,sig11 exif_get_slong|sig11 exif_get_sshort,471,2
+L3,out_L3_r6,97,11,3,sig11 +0xad03|sig11 exif_get_slong|sig11 exif_get_sshort,491,5
+L3,out_L3_r7,143,9,2,sig11 exif_get_slong|sig11 exif_get_sshort,474,2
+L3,out_L3_r8,85,7,2,sig11 +0xad03|sig11 exif_get_sshort,485,3
+L3,out_L3_r9,76,6,2,sig11 exif_get_slong|sig11 exif_get_sshort,477,2
