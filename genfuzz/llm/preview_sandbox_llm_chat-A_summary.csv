@@ -1,0 +1,5 @@
+level,inputs,edges,crash_inputs,distinct_bugs,bugs,fuzzer_mean_edges
+L0,10,88,0,0,,None
+L1,10,125,0,0,,None
+L2,10,200,0,0,,None
+L3,10,216,0,0,,None
