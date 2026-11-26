@@ -1,0 +1,4 @@
+libexif/
+exifbin
+out_*/
+*.o
