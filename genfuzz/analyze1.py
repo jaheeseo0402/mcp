@@ -1,5 +1,5 @@
 """실험 1 집계와 그래프.
-사용: python3 analyze1.py [타깃 실행파일] [출력 접두어]
+사용: python3 analyze1.py [타깃 실행파일] [출력 접두어] [분류용 실행파일]
 읽는 것: out_<단계>_r<반복>/default/plot_data, crashes/
 그리는 것(x축 = 시간(초), 선 하나 = 구조정보 단계, 음영 = 반복 최소~최대):
   (a) 고유 crash 수      : AFL++이 저장한 crash 수 (커버리지가 다른 것만 저장). crashes/ 파일 이름의 time으로 시각 복원
@@ -15,6 +15,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 BIN = sys.argv[1] if len(sys.argv) > 1 else "./tinyfmt"
+TRI = sys.argv[3] if len(sys.argv) > 3 else BIN   # crash 분류에 쓸 바이너리(exif는 exifbin_tri)
 PRE = sys.argv[2] if len(sys.argv) > 2 else "exp1"
 LEVELS = ["L0", "L1", "L2", "L3"]
 COL = {"L0": "#9aa5b1", "L1": "#2e75b6", "L2": "#d96a1e", "L3": "#1f3a6e"}
@@ -23,11 +24,14 @@ COL = {"L0": "#9aa5b1", "L1": "#2e75b6", "L2": "#d96a1e", "L3": "#1f3a6e"}
 def bug_id(path):
     """crash 파일을 타깃에 다시 넣어 버그 번호를 얻는다. 표시가 없으면 종료 신호로 대신한다."""
     try:
-        p = subprocess.run([BIN, path], capture_output=True, timeout=5)
+        p = subprocess.run([TRI, path], capture_output=True, timeout=5)
     except subprocess.TimeoutExpired:
         return "timeout"
     m = re.search(rb"\[BUG (\d+)\]", p.stderr)
-    return f"BUG{m.group(1).decode()}" if m else f"sig{p.returncode}"
+    if m:
+        return f"BUG{m.group(1).decode()}"
+    m = re.search(rb"\[CRASH ([^\]]+)\]", p.stderr)          # libexif: 신호 + 호출 스택 앞 3칸
+    return m.group(1).decode() if m else f"sig{p.returncode}"
 
 
 def ftime(path):

@@ -2,3 +2,4 @@ libexif/
 exifbin
 out_*/
 *.o
+exifbin_tri
