@@ -51,9 +51,9 @@ def edges_of(path):
         return set()
 
 
-def step(times, vals, grid):
+def step(times, vals, grid, init=0):
     """(시각, 값) 기록을 격자 시각마다 '그 시각까지의 마지막 값'으로 바꾼다."""
-    out, j, cur = [], 0, 0
+    out, j, cur = [], 0, init
     for g in grid:
         while j < len(times) and times[j] <= g:
             cur = vals[j]; j += 1
@@ -93,17 +93,18 @@ for L in LEVELS:
     for d in runs[L]:
         crashes = sorted((ftime(f), f) for f in glob.glob(f"{d}/default/crashes/id:*"))
         A["saved"].append(step([c[0] for c in crashes], range(1, len(crashes) + 1), grid))
-        ev, seen = [], set()
+        ev, seen, seen3 = [], set(), set()
         for tm, f in crashes:
-            b = bug_id(f)
+            b3 = bug_id(f); seen3.add(b3)
+            b = " ".join(b3.split()[:2])          # 신호 + 맨 위 함수 1칸(같은 곳에서 죽으면 한 버그로 센다)
             if b not in seen:
                 seen.add(b); ev.append((tm, len(seen)))
         A["bugs"].append(step([e[0] for e in ev], [e[1] for e in ev], grid))
         rows = [ln.split(",") for ln in open(f"{d}/default/plot_data") if not ln.startswith("#")]
         if len(rows) >= 5:   # 긴 실행: AFL++이 시간별로 적은 값을 그대로 쓴다(빠름). 열: 0 시간, 3 큐 크기, 12 edge 수
             rt = [float(r[0]) for r in rows]
-            A["corpus"].append(step(rt, [int(r[3]) for r in rows], grid))
-            A["edges"].append(step(rt, [int(r[12]) for r in rows], grid))
+            A["corpus"].append(step(rt, [int(r[3]) for r in rows], grid, int(rows[0][3])))
+            A["edges"].append(step(rt, [int(r[12]) for r in rows], grid, int(rows[0][12])))
             cov = range(int(rows[-1][12]))
         else:                # 짧은 실행: 큐 파일을 시각 순서로 afl-showmap에 넣어 누적
             queue = sorted((ftime(f), f) for f in glob.glob(f"{d}/default/queue/id:*"))
@@ -113,7 +114,7 @@ for L in LEVELS:
                 cov |= edges_of(f); eev.append((tm, len(cov)))
             A["edges"].append(step([e[0] for e in eev], [e[1] for e in eev], grid))
         tot.append(total_crashes(d))
-        summary.append((L, d, tot[-1], len(crashes), len(seen), sorted(seen), len(cov)))
+        summary.append((L, d, tot[-1], len(crashes), len(seen), sorted(seen), len(cov), len(seen3)))
     for k in series:
         series[k][L] = np.array(A[k], float)
     finals[L] = np.array(tot, float)
@@ -123,7 +124,7 @@ titles = {"saved": "(a) Unique crashes (saved by AFL++)", "bugs": "(b) Distinct 
 fig, ax = plt.subplots(1, 4, figsize=(19, 4.2))
 for a, k in zip(ax, ("saved", "bugs", "edges", "corpus")):
     for L, M in series[k].items():
-        a.plot(grid, M.mean(0), color=COL[L], lw=2, label=f"{L} (n={len(M)})")
+        a.plot(grid, M.mean(0), color=COL[L], lw=2.2 if L != "L0" else 3.2, ls="--" if L == "L0" else "-", label=f"{L} (n={len(M)})")
         if len(M) > 1:
             a.fill_between(grid, M.min(0), M.max(0), color=COL[L], alpha=0.15)
     a.set_title(titles[k], fontsize=11); a.set_xlabel("Time (s)"); a.grid(alpha=0.3)
@@ -136,14 +137,17 @@ data = [("Crashes (all)", finals), ("Unique crashes", {L: series["saved"][L][:, 
         ("Distinct bugs", {L: series["bugs"][L][:, -1] for L in series["bugs"]})]
 for a, (tt, D) in zip(ax, data):
     Ls = list(D)
-    a.bar(Ls, [D[L].mean() for L in Ls], yerr=[D[L].std() for L in Ls], color=[COL[L] for L in Ls], capsize=4)
+    a.bar(Ls, [D[L].mean() for L in Ls], color=[COL[L] for L in Ls], alpha=0.75)
+    for i, L in enumerate(Ls):                      # 반복(run)별 값을 점으로: 0도 점으로 보이게
+        a.scatter([i + (k - (len(D[L]) - 1) / 2) * 0.08 for k in range(len(D[L]))], D[L], color="k", s=22, zorder=3)
+        a.text(i, max(D[L]) * 1.03 + 0.02, f"{D[L].mean():.1f}", ha="center", fontsize=9)
     a.set_title(tt); a.set_xlabel("Structure info level"); a.grid(axis="y", alpha=0.3)
-ax[0].set_ylabel(f"Count at {int(T)} s (mean ± sd)")
+ax[0].set_ylabel(f"Count at {int(T)} s (bar = mean, dots = each run)")
 plt.tight_layout(); plt.savefig(f"{PRE}_final.png", dpi=170)
 
 with open(f"{PRE}_summary.csv", "w") as f:
-    f.write("level,run,total_crashes,unique_crashes,distinct_bugs,bugs,edges\n")
-    for L, d, tc, sc, nb, bs, ed in summary:
-        f.write(f"{L},{d},{tc},{sc},{nb},{'|'.join(bs)},{ed}\n")
+    f.write("level,run,total_crashes,unique_crashes,distinct_bugs,bugs,edges,distinct_bugs_3frame\n")
+    for L, d, tc, sc, nb, bs, ed, n3 in summary:
+        f.write(f"{L},{d},{tc},{sc},{nb},{'|'.join(bs)},{ed},{n3}\n")
 print(open(f"{PRE}_summary.csv").read())
 print("그림:", f"{PRE}_time.png", f"{PRE}_final.png")
