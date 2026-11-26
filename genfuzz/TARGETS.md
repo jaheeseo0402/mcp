@@ -25,3 +25,13 @@ python3 ../analyze1.py ./cjsonbin cjson ./cjsonbin_tri         # 시간 그래�
 python3 ../analyze_cov.py cjson ./cjsoncov cJSON                # 단계별로 열린 함수·줄 (심화)
 python3 ../analyze_bugs.py cjson ./cjsonbin_tri                 # 버그 종류·위치·몇 번 찾았나 (심화)
 ```
+
+## 샌드박스 예비 확인 (90초, 반복 1번, ASAN 없음 — 논문 결과 아님, 파이프라인 검증용)
+| 타깃 | L0 | L1 | L2 | L3 (edge 수, 끝 시점) | 읽는 법 |
+|---|---|---|---|---|---|
+| cJSON | 252 | 259 | 303 | 318 | 단계가 올라갈수록 완만하게 늘어남 |
+| libyaml | 1794 | 1747 | 1860 | 1823 | 거의 차이 없음(YAML은 아무 글자나 문서로 받아들여 시그니처·구조 정보가 필요 없다) |
+| lodepng | 39 | 37 | 47 | 924 | L0~L2는 거의 못 들어가고 L3(유효 PNG)에서 한 번에 열림 |
+- lodepng에서 `analyze_cov.py`로 본 함수 수: L0 29, L1 29, L2 33, L3 181. L0~L2는 해독기 입구까지만 가고 압축 해제(Huffman)·필터 코드는 L3에서만 열린다.
+- crash는 ASAN이 없는 이 검증 빌드에서는 0건이다. ASAN 빌드(`build.sh`)로 돌려야 메모리 오류를 잡는다.
+- 형식이 엄격할수록 단계 차이가 크고(lodepng), 느슨할수록 작다(libyaml)는 가설을 세울 수 있다. 10분 × 반복으로 확인해야 한다.
