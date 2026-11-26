@@ -1,0 +1,7 @@
+out_*/
+cjsonbin
+cjsonbin_tri
+cjsoncov
+*.gcno
+*.gcda
+cJSON/

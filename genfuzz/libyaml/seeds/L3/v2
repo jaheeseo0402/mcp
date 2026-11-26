@@ -1,0 +1,9 @@
+- |
+  literal
+  text
+- >
+  folded
+  text
+- "dq\n"
+- 'sq'
+# comment

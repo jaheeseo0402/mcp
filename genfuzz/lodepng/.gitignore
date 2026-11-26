@@ -1,0 +1,7 @@
+out_*/
+lodepngbin
+lodepngbin_tri
+lodepngcov
+*.gcno
+*.gcda
+lodepng/

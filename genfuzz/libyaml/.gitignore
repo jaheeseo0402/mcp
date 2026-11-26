@@ -1,0 +1,7 @@
+out_*/
+libyamlbin
+libyamlbin_tri
+libyamlcov
+*.gcno
+*.gcda
+libyaml/

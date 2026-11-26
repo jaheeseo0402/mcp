@@ -32,6 +32,11 @@ def bug_of(tri, path):
     m = re.search(rb"\[CRASH ([^\]]+)\]", p.stderr)
     if m:
         return " ".join(m.group(1).decode().split()[:2])
+    m = re.search(rb"ERROR: AddressSanitizer: (\S+)", p.stderr)
+    if m:
+        fr = [x.decode() for x in re.findall(rb"#\d+ 0x[0-9a-f]+ in (\S+)", p.stderr)]
+        fr = [x for x in fr if not x.startswith(("__", "operator", "malloc", "calloc", "realloc", "free", "mem", "str"))]
+        return "ASAN-" + m.group(1).decode() + " " + (fr[0] if fr else "?")
     return f"sig{p.returncode}" if p.returncode < 0 else None
 
 

@@ -31,7 +31,13 @@ def bug_id(path):
     if m:
         return f"BUG{m.group(1).decode()}"
     m = re.search(rb"\[CRASH ([^\]]+)\]", p.stderr)          # libexif: 신호 + 호출 스택 앞 3칸
-    return m.group(1).decode() if m else f"sig{p.returncode}"
+    if m: return m.group(1).decode()
+    m = re.search(rb"ERROR: AddressSanitizer: (\S+)", p.stderr)   # ASAN 타깃(cJSON, libyaml, lodepng): 오류 종류 + 스택 앞 함수
+    if m:
+        fr = re.findall(rb"#\d+ 0x[0-9a-f]+ in (\S+)", p.stderr)
+        fr = [x.decode() for x in fr if not x.startswith(b"__") and not x.decode().startswith(("operator","malloc","calloc","realloc","free","memcpy","memmove","memset","strlen"))]
+        return "ASAN-" + m.group(1).decode() + " " + (fr[0] if fr else "?")
+    return f"sig{p.returncode}"
 
 
 def ftime(path):

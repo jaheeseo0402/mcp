@@ -1,0 +1,7 @@
+---
+name: x
+list:
+  - 1
+  - 2.5
+  - true
+map: {a: 1, b: [x, y]}
