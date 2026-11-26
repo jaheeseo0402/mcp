@@ -99,12 +99,19 @@ for L in LEVELS:
             if b not in seen:
                 seen.add(b); ev.append((tm, len(seen)))
         A["bugs"].append(step([e[0] for e in ev], [e[1] for e in ev], grid))
-        queue = sorted((ftime(f), f) for f in glob.glob(f"{d}/default/queue/id:*"))
-        A["corpus"].append(step([q[0] for q in queue], range(1, len(queue) + 1), grid))
-        cov, eev = set(), []
-        for tm, f in queue:
-            cov |= edges_of(f); eev.append((tm, len(cov)))
-        A["edges"].append(step([e[0] for e in eev], [e[1] for e in eev], grid))
+        rows = [ln.split(",") for ln in open(f"{d}/default/plot_data") if not ln.startswith("#")]
+        if len(rows) >= 5:   # 긴 실행: AFL++이 시간별로 적은 값을 그대로 쓴다(빠름). 열: 0 시간, 3 큐 크기, 12 edge 수
+            rt = [float(r[0]) for r in rows]
+            A["corpus"].append(step(rt, [int(r[3]) for r in rows], grid))
+            A["edges"].append(step(rt, [int(r[12]) for r in rows], grid))
+            cov = range(int(rows[-1][12]))
+        else:                # 짧은 실행: 큐 파일을 시각 순서로 afl-showmap에 넣어 누적
+            queue = sorted((ftime(f), f) for f in glob.glob(f"{d}/default/queue/id:*"))
+            A["corpus"].append(step([q[0] for q in queue], range(1, len(queue) + 1), grid))
+            cov, eev = set(), []
+            for tm, f in queue:
+                cov |= edges_of(f); eev.append((tm, len(cov)))
+            A["edges"].append(step([e[0] for e in eev], [e[1] for e in eev], grid))
         tot.append(total_crashes(d))
         summary.append((L, d, tot[-1], len(crashes), len(seen), sorted(seen), len(cov)))
     for k in series:
