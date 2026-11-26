@@ -1,0 +1,11 @@
+You are testing a program that reads the EXIF metadata of JPEG files. A JPEG file starts with the bytes FF D8 FF E1. Structure of the file:
+- FF D8 (start of image), then FF E1 (APP1 marker), then a 2-byte big-endian length of the APP1 segment.
+- Then the 6 bytes `Exif\0\0` = 45 78 69 66 00 00.
+- Then a TIFF header: byte order `II` (49 49, little endian) or `MM` (4D 4D, big endian), then 2A 00 (or 00 2A), then a 4-byte offset to the first IFD (usually 8).
+- An IFD is: 2-byte entry count, then entries of 12 bytes each, then a 4-byte offset to the next IFD (0 = none).
+- An entry is: tag (2 bytes), type (2 bytes, 1..12: byte, ascii, short, long, rational, ...), count (4 bytes), value or offset to the value (4 bytes; values longer than 4 bytes are stored elsewhere and this field is an offset from the TIFF header).
+- Common tags: 010F Make, 0110 Model, 0112 Orientation, 011A XResolution, 0131 Software, 8769 Exif IFD pointer, 8825 GPS IFD pointer, 927C MakerNote.
+- The file ends with FF D9.
+
+Generate 10 different test input files for the program. Try to make inputs that reach many different code paths of its parser, including unusual or malformed ones that may trigger bugs.
+Output format (strict): exactly one input per line, written as `INPUT: ` followed by the file bytes as a hexadecimal string without spaces (for example `INPUT: 0a1b2c3d`). Each input must be at most 150 bytes. Do not write anything else.
