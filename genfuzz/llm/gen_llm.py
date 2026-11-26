@@ -111,7 +111,13 @@ if __name__ == "__main__":
                 if os.path.exists(fn):
                     continue
                 t0 = time.time(); print(f"{L} #{k} 요청 중...", flush=True)
-                resp = ask_ollama(model, build_prompt(L), seed=k)
+                resp = ""
+                for attempt in range(4):             # 서버 오류(HTTP 500 등)가 나면 시드를 바꿔 다시 시도
+                    try:
+                        resp = ask_ollama(model, build_prompt(L), seed=k + 1000 * attempt)
+                        break
+                    except Exception as e:
+                        print(f"  오류({e}) -> 재시도 {attempt + 1}/3", flush=True); time.sleep(3)
                 if not resp.strip():
                     print("  빈 응답: 저장하지 않음"); continue
                 open(fn, "w").write(resp)

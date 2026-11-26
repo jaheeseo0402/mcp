@@ -3,23 +3,27 @@
 #include <stdlib.h>
 #ifdef TRIAGE
 #include <execinfo.h>
+#include <dlfcn.h>
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
-/* crash 위치 기록용: 시그널을 받으면 호출 스택에서 exifbin 안의 앞쪽 3개 위치를 한 줄로 찍는다 */
+/* crash 위치 기록용: 시그널을 받으면 호출 스택에서 exifbin 안의 앞쪽 3개 위치(함수 이름, 없으면 +오프셋)를 한 줄로 찍는다.
+   힙이 깨진 상태에서도 동작하도록 malloc을 쓰지 않는다(backtrace_symbols 대신 dladdr). */
 static void on_sig(int s){
-  void *b[16]; int n = backtrace(b,16); char **sy = backtrace_symbols(b,n);
+  void *b[16]; int n = backtrace(b,16);
   char out[512]; int k=0, m=0; k += snprintf(out,sizeof out,"[CRASH sig%d",s);
-  for(int i=1;i<n && m<3;i++){ if(sy && strstr(sy[i],"exifbin")){
-      char *o=strchr(sy[i],'('), *c=o?strchr(o,')'):NULL; if(!o||!c) continue;
-      char *p=strchr(o,'+'); if(p && p<c && p>o+1) c=p;   /* 함수 이름만(오프셋 제거); 이름이 없으면 +오프셋 그대로 */
-      k += snprintf(out+k,sizeof out-k," %.*s",(int)(c-o-1),o+1); m++; } }
-  snprintf(out+k,sizeof out-k,"]\n"); write(2,out,strlen(out)); _exit(100+s);
+  for(int i=1;i<n && m<3;i++){ Dl_info di;
+    if(!dladdr(b[i],&di) || !di.dli_fname || !strstr(di.dli_fname,"exifbin")) continue;
+    if(di.dli_sname) k += snprintf(out+k,sizeof out-k," %s",di.dli_sname);
+    else k += snprintf(out+k,sizeof out-k," +0x%lx",(unsigned long)((char*)b[i]-(char*)di.dli_fbase));
+    m++; }
+  snprintf(out+k,sizeof out-k,"]\n"); if(write(2,out,strlen(out))<0) {} _exit(100+s);
 }
 #endif
 int main(int argc,char**argv){
 #ifdef TRIAGE
-  { /* 스택이 바닥난 crash도 잡도록 비상 스택(sigaltstack) 위에서 처리 함수를 실행한다 */
+  { void *warm[2]; backtrace(warm,2); /* backtrace 첫 호출은 내부에서 메모리를 쓰므로 미리 한 번 호출해 둔다 */
+    /* 스택이 바닥난 crash도 잡도록 비상 스택(sigaltstack) 위에서 처리 함수를 실행한다 */
     static char altstk[65536]; stack_t ss = { .ss_sp = altstk, .ss_size = sizeof altstk, .ss_flags = 0 };
     sigaltstack(&ss, NULL);
     struct sigaction sa; memset(&sa, 0, sizeof sa); sa.sa_handler = on_sig; sa.sa_flags = SA_ONSTACK; sigemptyset(&sa.sa_mask);
