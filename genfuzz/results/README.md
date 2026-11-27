@@ -108,3 +108,17 @@ edge 집합 비교
 - `exif/llm_chat-A_summary.csv|.png` 실험 3 (`llm/llm_eval.py`)
 - `exif/cmp_chat-A_summary.csv|.png` 실험 2 (`llm/llm_vs_fuzz.py`)
 - `tinyfmt/exp1_*` 합성 타깃 검증용
+
+
+## 부록. 다른 타깃: lodepng (PNG)
+
+상세는 `lodepng/README.md`. 10분, ASAN 빌드, L0, L1 3번 / L2, L3 8번.
+
+| 단계 | edge 평균 (범위) | crash |
+|---|---|---|
+| L0 | 42.7 (42~43) | 0 |
+| L1 | 45.0 (43~47) | 0 |
+| L2 | 67.4 (47~120) | 0 |
+| L3 | 1079.2 (995~1133) | 0 |
+
+libexif는 L2에서 열렸지만 PNG는 L3(유효 샘플)에서 한 번에 열린다(L2 대 L3 edge p=0.0009). 함수 기준으로 L0 29, L1 +2, L2 +14, L3 +138개가 처음 도달된다. crash는 없었다.

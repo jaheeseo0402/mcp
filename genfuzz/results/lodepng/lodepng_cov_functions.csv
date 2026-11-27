@@ -1,0 +1,184 @@
+first_level,file,function,levels_reaching
+L0,lodepng.cpp,LodePNGIText_cleanup(LodePNGInfo*),L0+L1+L2+L3
+L0,lodepng.cpp,LodePNGIText_init(LodePNGInfo*),L0+L1+L2+L3
+L0,lodepng.cpp,LodePNGText_cleanup(LodePNGInfo*),L0+L1+L2+L3
+L0,lodepng.cpp,LodePNGText_init(LodePNGInfo*),L0+L1+L2+L3
+L0,lodepng.cpp,LodePNGUnknownChunks_cleanup(LodePNGInfo*),L0+L1+L2+L3
+L0,lodepng.cpp,LodePNGUnknownChunks_init(LodePNGInfo*),L0+L1+L2+L3
+L0,lodepng.cpp,decodeGeneric(unsigned char**, unsigned int*, unsigned int*, LodePNGState*, unsigned char const*, unsigned long),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng::State::State(),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng::State::~State(),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng::decode(std::vector<unsigned char, std::allocator<unsigned char> >&, unsigned int&, unsigned int&, lodepng::State&, std::vector<unsigned char, std::allocator<unsigned char> > const&),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng::decode(std::vector<unsigned char, std::allocator<unsigned char> >&, unsigned int&, unsigned int&, lodepng::State&, unsigned char const*, unsigned long),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_clear_exif(LodePNGInfo*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_clear_icc(LodePNGInfo*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_color_mode_cleanup(LodePNGColorMode*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_color_mode_init(LodePNGColorMode*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_compress_settings_init(LodePNGCompressSettings*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_decode(unsigned char**, unsigned int*, unsigned int*, LodePNGState*, unsigned char const*, unsigned long),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_decoder_settings_init(LodePNGDecoderSettings*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_decompress_settings_init(LodePNGDecompressSettings*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_encoder_settings_init(LodePNGEncoderSettings*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_free(void*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_info_cleanup(LodePNGInfo*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_info_init(LodePNGInfo*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_init_exif(LodePNGInfo*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_init_icc(LodePNGInfo*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_inspect(unsigned int*, unsigned int*, LodePNGState*, unsigned char const*, unsigned long),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_palette_clear(LodePNGColorMode*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_state_cleanup(LodePNGState*),L0+L1+L2+L3
+L0,lodepng.cpp,lodepng_state_init(LodePNGState*),L0+L1+L2+L3
+L1,lodepng.cpp,lodepng_chunk_length(unsigned char const*),L1+L2+L3
+L1,lodepng.cpp,lodepng_read32bitInt(unsigned char const*),L1+L2+L3
+L2,lodepng.cpp,checkColorValidity(LodePNGColorType, unsigned int),L2+L3
+L2,lodepng.cpp,getNumColorChannels(LodePNGColorType),L2+L3
+L2,lodepng.cpp,lodepng_addofl(unsigned long, unsigned long, unsigned long*),L2+L3
+L2,lodepng.cpp,lodepng_chunk_ancillary(unsigned char const*),L2+L3
+L2,lodepng.cpp,lodepng_chunk_data_const(unsigned char const*),L2+L3
+L2,lodepng.cpp,lodepng_chunk_reserved(unsigned char const*),L2+L3
+L2,lodepng.cpp,lodepng_chunk_type_equals(unsigned char const*, char const*),L2+L3
+L2,lodepng.cpp,lodepng_chunk_type_name_valid(unsigned char const*),L2+L3
+L2,lodepng.cpp,lodepng_get_bpp(LodePNGColorMode const*),L2+L3
+L2,lodepng.cpp,lodepng_get_bpp_lct(LodePNGColorType, unsigned int),L2+L3
+L2,lodepng.cpp,lodepng_malloc(unsigned long),L2+L3
+L2,lodepng.cpp,lodepng_mulofl(unsigned long, unsigned long, unsigned long*),L2+L3
+L2,lodepng.cpp,lodepng_pixel_overflow(unsigned int, unsigned int, LodePNGColorMode const*, LodePNGColorMode const*),L2+L3
+L2,lodepng.cpp,lodepng_strlen(char const*),L2+L3
+L3,lodepng.cpp,Adam7_deinterlace(unsigned char*, unsigned char const*, unsigned int, unsigned int, unsigned int),L3
+L3,lodepng.cpp,Adam7_getpassvalues(unsigned int*, unsigned int*, unsigned long*, unsigned long*, unsigned long*, unsigned int, unsigned int, unsigned int),L3
+L3,lodepng.cpp,HuffmanTree_cleanup(HuffmanTree*),L3
+L3,lodepng.cpp,HuffmanTree_init(HuffmanTree*),L3
+L3,lodepng.cpp,HuffmanTree_makeFromFrequencies(HuffmanTree*, unsigned int const*, unsigned long, unsigned long, unsigned int),L3
+L3,lodepng.cpp,HuffmanTree_makeFromLengths(HuffmanTree*, unsigned int const*, unsigned long, unsigned int),L3
+L3,lodepng.cpp,HuffmanTree_makeFromLengths2(HuffmanTree*),L3
+L3,lodepng.cpp,HuffmanTree_makeTable(HuffmanTree*),L3
+L3,lodepng.cpp,LodePNGBitReader_init(LodePNGBitReader*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,LodePNGBitWriter_init(LodePNGBitWriter*, ucvector*),L3
+L3,lodepng.cpp,LodePNGIText_copy(LodePNGInfo*, LodePNGInfo const*),L3
+L3,lodepng.cpp,LodePNGText_copy(LodePNGInfo*, LodePNGInfo const*),L3
+L3,lodepng.cpp,LodePNGUnknownChunks_copy(LodePNGInfo*, LodePNGInfo const*),L3
+L3,lodepng.cpp,addChunk_IDAT(ucvector*, unsigned char const*, unsigned long, LodePNGCompressSettings const*),L3
+L3,lodepng.cpp,addChunk_IEND(ucvector*),L3
+L3,lodepng.cpp,addChunk_IHDR(ucvector*, unsigned int, unsigned int, LodePNGColorType, unsigned int, unsigned int),L3
+L3,lodepng.cpp,addChunk_PLTE(ucvector*, LodePNGColorMode const*),L3
+L3,lodepng.cpp,addChunk_tRNS(ucvector*, LodePNGColorMode const*),L3
+L3,lodepng.cpp,addColorBits(unsigned char*, unsigned long, unsigned int, unsigned int),L3
+L3,lodepng.cpp,addLengthDistance(uivector*, unsigned long, unsigned long),L3
+L3,lodepng.cpp,addPaddingBits(unsigned char*, unsigned char const*, unsigned long, unsigned long, unsigned int),L3
+L3,lodepng.cpp,addUnknownChunks(ucvector*, unsigned char*, unsigned long),L3
+L3,lodepng.cpp,adler32(unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,advanceBits(LodePNGBitReader*, unsigned long),L3
+L3,lodepng.cpp,alloc_string(char const*),L3
+L3,lodepng.cpp,alloc_string_sized(char const*, unsigned long),L3
+L3,lodepng.cpp,auto_choose_color(LodePNGColorMode*, LodePNGColorMode const*, LodePNGColorStats const*),L3
+L3,lodepng.cpp,boundaryPM(BPMLists*, BPMNode*, unsigned long, int, int),L3
+L3,lodepng.cpp,bpmnode_create(BPMLists*, int, unsigned int, BPMNode*),L3
+L3,lodepng.cpp,bpmnode_sort(BPMNode*, unsigned long),L3
+L3,lodepng.cpp,color_tree_add(ColorTree*, unsigned char, unsigned char, unsigned char, unsigned char, unsigned int),L3
+L3,lodepng.cpp,color_tree_cleanup(ColorTree*),L3
+L3,lodepng.cpp,color_tree_get(ColorTree*, unsigned char, unsigned char, unsigned char, unsigned char),L3
+L3,lodepng.cpp,color_tree_has(ColorTree*, unsigned char, unsigned char, unsigned char, unsigned char),L3
+L3,lodepng.cpp,color_tree_init(ColorTree*),L3
+L3,lodepng.cpp,countZeros(unsigned char const*, unsigned long, unsigned long),L3
+L3,lodepng.cpp,deflate(unsigned char**, unsigned long*, unsigned char const*, unsigned long, LodePNGCompressSettings const*),L3
+L3,lodepng.cpp,deflateDynamic(LodePNGBitWriter*, Hash*, unsigned char const*, unsigned long, unsigned long, LodePNGCompressSettings const*, unsigned int),L3
+L3,lodepng.cpp,encodeLZ77(uivector*, Hash*, unsigned char const*, unsigned long, unsigned long, unsigned int, unsigned int, unsigned int, unsigned int),L3
+L3,lodepng.cpp,ensureBits17(LodePNGBitReader*, unsigned long),L3
+L3,lodepng.cpp,ensureBits25(LodePNGBitReader*, unsigned long),L3
+L3,lodepng.cpp,ensureBits32(LodePNGBitReader*, unsigned long),L3
+L3,lodepng.cpp,ensureBits9(LodePNGBitReader*, unsigned long),L3
+L3,lodepng.cpp,filter(unsigned char*, unsigned char const*, unsigned int, unsigned int, LodePNGColorMode const*, LodePNGEncoderSettings const*),L3
+L3,lodepng.cpp,filterScanline(unsigned char*, unsigned char const*, unsigned char const*, unsigned long, unsigned long, unsigned char),L3
+L3,lodepng.cpp,generateFixedDistanceTree(HuffmanTree*),L3
+L3,lodepng.cpp,generateFixedLitLenTree(HuffmanTree*),L3
+L3,lodepng.cpp,getHash(unsigned char const*, unsigned long, unsigned long),L3
+L3,lodepng.cpp,getPixelColorRGBA8(unsigned char*, unsigned char*, unsigned char*, unsigned char*, unsigned char const*, unsigned long, LodePNGColorMode const*),L3
+L3,lodepng.cpp,getPixelColorsRGB8(unsigned char*, unsigned long, unsigned char const*, LodePNGColorMode const*),L3
+L3,lodepng.cpp,getPixelColorsRGBA8(unsigned char*, unsigned long, unsigned char const*, LodePNGColorMode const*),L3
+L3,lodepng.cpp,getTreeInflateDynamic(HuffmanTree*, HuffmanTree*, LodePNGBitReader*),L3
+L3,lodepng.cpp,getTreeInflateFixed(HuffmanTree*, HuffmanTree*),L3
+L3,lodepng.cpp,getValueRequiredBits(unsigned char),L3
+L3,lodepng.cpp,hash_cleanup(Hash*),L3
+L3,lodepng.cpp,hash_init(Hash*, unsigned int),L3
+L3,lodepng.cpp,huffmanDecodeSymbol(LodePNGBitReader*, HuffmanTree const*),L3
+L3,lodepng.cpp,inflateHuffmanBlock(ucvector*, LodePNGBitReader*, unsigned int, unsigned long),L3
+L3,lodepng.cpp,inflateNoCompression(ucvector*, LodePNGBitReader*, LodePNGDecompressSettings const*),L3
+L3,lodepng.cpp,inflatev(ucvector*, unsigned char const*, unsigned long, LodePNGDecompressSettings const*),L3
+L3,lodepng.cpp,lodepng::encode(std::vector<unsigned char, std::allocator<unsigned char> >&, std::vector<unsigned char, std::allocator<unsigned char> > const&, unsigned int, unsigned int, lodepng::State&),L3
+L3,lodepng.cpp,lodepng::encode(std::vector<unsigned char, std::allocator<unsigned char> >&, unsigned char const*, unsigned int, unsigned int, lodepng::State&),L3
+L3,lodepng.cpp,lodepng_add_itext_sized(LodePNGInfo*, char const*, char const*, char const*, char const*, unsigned long),L3
+L3,lodepng.cpp,lodepng_add_text(LodePNGInfo*, char const*, char const*),L3
+L3,lodepng.cpp,lodepng_add_text_sized(LodePNGInfo*, char const*, char const*, unsigned long),L3
+L3,lodepng.cpp,lodepng_addofls(unsigned long, unsigned long),L3
+L3,lodepng.cpp,lodepng_can_have_alpha(LodePNGColorMode const*),L3
+L3,lodepng.cpp,lodepng_chunk_append(unsigned char**, unsigned long*, unsigned char const*),L3
+L3,lodepng.cpp,lodepng_chunk_createv(ucvector*, unsigned long, char const*, unsigned char const*),L3
+L3,lodepng.cpp,lodepng_chunk_generate_crc(unsigned char*),L3
+L3,lodepng.cpp,lodepng_chunk_init(unsigned char**, ucvector*, unsigned long, char const*),L3
+L3,lodepng.cpp,lodepng_chunk_next_const(unsigned char const*, unsigned char const*),L3
+L3,lodepng.cpp,lodepng_color_mode_alloc_palette(LodePNGColorMode*),L3
+L3,lodepng.cpp,lodepng_color_mode_copy(LodePNGColorMode*, LodePNGColorMode const*),L3
+L3,lodepng.cpp,lodepng_color_mode_equal(LodePNGColorMode const*, LodePNGColorMode const*),L3
+L3,lodepng.cpp,lodepng_color_stats_init(LodePNGColorStats*),L3
+L3,lodepng.cpp,lodepng_compute_color_stats(LodePNGColorStats*, unsigned char const*, unsigned int, unsigned int, LodePNGColorMode const*),L3
+L3,lodepng.cpp,lodepng_convert(unsigned char*, unsigned char const*, LodePNGColorMode const*, LodePNGColorMode const*, unsigned int, unsigned int),L3
+L3,lodepng.cpp,lodepng_crc32(unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,lodepng_deflate(unsigned char**, unsigned long*, unsigned char const*, unsigned long, LodePNGCompressSettings const*),L3
+L3,lodepng.cpp,lodepng_deflatev(ucvector*, unsigned char const*, unsigned long, LodePNGCompressSettings const*),L3
+L3,lodepng.cpp,lodepng_encode(unsigned char**, unsigned long*, unsigned char const*, unsigned int, unsigned int, LodePNGState*),L3
+L3,lodepng.cpp,lodepng_get_raw_size(unsigned int, unsigned int, LodePNGColorMode const*),L3
+L3,lodepng.cpp,lodepng_get_raw_size_idat(unsigned int, unsigned int, unsigned int),L3
+L3,lodepng.cpp,lodepng_get_raw_size_lct(unsigned int, unsigned int, LodePNGColorType, unsigned int),L3
+L3,lodepng.cpp,lodepng_gtofl(unsigned long, unsigned long, unsigned long),L3
+L3,lodepng.cpp,lodepng_huffman_code_lengths(unsigned int*, unsigned int const*, unsigned long, unsigned int),L3
+L3,lodepng.cpp,lodepng_inflatev(ucvector*, unsigned char const*, unsigned long, LodePNGDecompressSettings const*),L3
+L3,lodepng.cpp,lodepng_info_copy(LodePNGInfo*, LodePNGInfo const*),L3
+L3,lodepng.cpp,lodepng_is_alpha_type(LodePNGColorMode const*),L3
+L3,lodepng.cpp,lodepng_is_greyscale_type(LodePNGColorMode const*),L3
+L3,lodepng.cpp,lodepng_memcpy(void*, void const*, unsigned long),L3
+L3,lodepng.cpp,lodepng_memset(void*, int, unsigned long),L3
+L3,lodepng.cpp,lodepng_palette_add(LodePNGColorMode*, unsigned char, unsigned char, unsigned char, unsigned char),L3
+L3,lodepng.cpp,lodepng_realloc(void*, unsigned long),L3
+L3,lodepng.cpp,lodepng_set32bitInt(unsigned char*, unsigned int),L3
+L3,lodepng.cpp,lodepng_zlib_compress(unsigned char**, unsigned long*, unsigned char const*, unsigned long, LodePNGCompressSettings const*),L3
+L3,lodepng.cpp,lodepng_zlib_decompressv(ucvector*, unsigned char const*, unsigned long, LodePNGDecompressSettings const*),L3
+L3,lodepng.cpp,paethPredictor(unsigned char, unsigned char, unsigned char),L3
+L3,lodepng.cpp,peekBits(LodePNGBitReader*, unsigned long),L3
+L3,lodepng.cpp,postProcessScanlines(unsigned char*, unsigned char*, unsigned int, unsigned int, LodePNGInfo const*),L3
+L3,lodepng.cpp,preProcessScanlines(unsigned char**, unsigned long*, unsigned char const*, unsigned int, unsigned int, LodePNGInfo const*, LodePNGEncoderSettings const*),L3
+L3,lodepng.cpp,readBitFromReversedStream(unsigned long*, unsigned char const*),L3
+L3,lodepng.cpp,readBits(LodePNGBitReader*, unsigned long),L3
+L3,lodepng.cpp,readChunk_PLTE(LodePNGColorMode*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,readChunk_bKGD(LodePNGInfo*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,readChunk_cHRM(LodePNGInfo*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,readChunk_gAMA(LodePNGInfo*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,readChunk_iCCP(LodePNGInfo*, LodePNGDecoderSettings const*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,readChunk_iTXt(LodePNGInfo*, LodePNGDecoderSettings const*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,readChunk_pHYs(LodePNGInfo*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,readChunk_sBIT(LodePNGInfo*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,readChunk_sRGB(LodePNGInfo*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,readChunk_tEXt(LodePNGInfo*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,readChunk_tIME(LodePNGInfo*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,readChunk_tRNS(LodePNGColorMode*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,readChunk_zTXt(LodePNGInfo*, LodePNGDecoderSettings const*, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,reverseBits(unsigned int, unsigned int),L3
+L3,lodepng.cpp,rgba8ToPixel(unsigned char*, unsigned long, LodePNGColorMode const*, ColorTree*, unsigned char, unsigned char, unsigned char, unsigned char),L3
+L3,lodepng.cpp,searchCodeIndex(unsigned int const*, unsigned long, unsigned long),L3
+L3,lodepng.cpp,setBitOfReversedStream(unsigned long*, unsigned char*, unsigned char),L3
+L3,lodepng.cpp,ucvector_init(unsigned char*, unsigned long),L3
+L3,lodepng.cpp,ucvector_reserve(ucvector*, unsigned long),L3
+L3,lodepng.cpp,ucvector_resize(ucvector*, unsigned long),L3
+L3,lodepng.cpp,uivector_cleanup(void*),L3
+L3,lodepng.cpp,uivector_init(uivector*),L3
+L3,lodepng.cpp,uivector_push_back(uivector*, unsigned int),L3
+L3,lodepng.cpp,uivector_resize(uivector*, unsigned long),L3
+L3,lodepng.cpp,unfilter(unsigned char*, unsigned char const*, unsigned int, unsigned int, unsigned int),L3
+L3,lodepng.cpp,unfilterScanline(unsigned char*, unsigned char const*, unsigned char const*, unsigned long, unsigned char, unsigned long),L3
+L3,lodepng.cpp,updateHashChain(Hash*, unsigned long, unsigned int, unsigned short),L3
+L3,lodepng.cpp,update_adler32(unsigned int, unsigned char const*, unsigned long),L3
+L3,lodepng.cpp,writeBits(LodePNGBitWriter*, unsigned int, unsigned long),L3
+L3,lodepng.cpp,writeBitsReversed(LodePNGBitWriter*, unsigned int, unsigned long),L3
+L3,lodepng.cpp,writeLZ77data(LodePNGBitWriter*, uivector const*, HuffmanTree const*, HuffmanTree const*),L3
+L3,lodepng.cpp,writeSignature(ucvector*),L3
+L3,lodepng.cpp,zlib_compress(unsigned char**, unsigned long*, unsigned char const*, unsigned long, LodePNGCompressSettings const*),L3
+L3,lodepng.cpp,zlib_decompress(unsigned char**, unsigned long*, unsigned long, unsigned char const*, unsigned long, LodePNGDecompressSettings const*),L3
