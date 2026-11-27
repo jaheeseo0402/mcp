@@ -35,3 +35,8 @@ python3 ../analyze_bugs.py cjson ./cjsonbin_tri                 # 버그 종류�
 - lodepng에서 `analyze_cov.py`로 본 함수 수: L0 29, L1 29, L2 33, L3 181. L0~L2는 해독기 입구까지만 가고 압축 해제(Huffman)·필터 코드는 L3에서만 열린다.
 - crash는 ASAN이 없는 이 검증 빌드에서는 0건이다. ASAN 빌드(`build.sh`)로 돌려야 메모리 오류를 잡는다.
 - 형식이 엄격할수록 단계 차이가 크고(lodepng), 느슨할수록 작다(libyaml)는 가설을 세울 수 있다. 10분 × 반복으로 확인해야 한다.
+
+## 알려진 문제: cJSON을 afl-cc -O1로 빌드하면 시드가 전부 crash (2026-11-27)
+- 증상: `afl-fuzz`가 "We need at least one valid input seed that does not crash!"로 바로 종료. 같은 시드가 gcc ASAN 빌드(`cjsonbin_tri`)와 샌드박스 빌드에서는 정상.
+- 확인: `./cjsonbin seeds/L3/v1`에서 `print_string_ptr cJSON.c:870` SEGV(주소가 잘린 포인터). `-O0`으로 다시 빌드하면 정상.
+- 조치: `build.sh`의 `cjsonbin`을 `-O0`으로 빌드. 원인(clang 최적화와 cJSON 1.7.8 코드의 상호작용)은 확인하지 못했다.
